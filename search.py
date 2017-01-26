@@ -68,7 +68,10 @@ def tinyMazeSearch(problem):
   return  [s,s,w,s,w,w,s,w]
 
 
-def unvisted_nodes(successors, visitedNodes):
+def unvisited_nodes(successors, visitedNodes):
+    """
+    Returns a list of the un-visited nodes from a list of possible nodes.
+    """
     unvisited = []
     for node in successors:
         if node[0] not in visitedNodes:
@@ -76,14 +79,22 @@ def unvisted_nodes(successors, visitedNodes):
     return unvisited
 
 
-def shortest_path(paths):
-    lengths = []
-    for path in paths:
-        lengths.append(len(path))
-    best = paths[lengths.index(min(lengths))]
-    return best
+# def shortest_path(paths):
+#     """
+#     Returns the shortest path of coordinates given a list of
+#     possible paths to reach the goal state.
+#     """
+#     lengths = []
+#     for path in paths:
+#         lengths.append(len(path))
+#     best = paths[lengths.index(min(lengths))]
+#     return best
+
 
 def actions(graph,positions):
+    """
+    Returns the sequence of actions an agent
+    """
     actions = []
     for i in range(len(positions)-1):
         posDest = graph[positions[i]]
@@ -107,41 +118,73 @@ def depthFirstSearch(problem):
   print "Is the start a goal?", problem.isGoalState(problem.getStartState())
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
-  "*** YOUR CODE HERE ***"
-  from game import Directions
 
   start = problem.getStartState()
   graph = {}
   graph[start] = problem.getSuccessors(problem.getStartState())
   frontier = util.Stack()
   frontier.push((start,[start]))
-  possiblePaths = []
+  explored = set()
 
   while frontier:
-      if frontier.isEmpty():
-          thePath = shortest_path(possiblePaths)
-          act = actions(graph, thePath)
-          return act
-      else:
-        (node, path) = frontier.pop()
-        for successor in unvisted_nodes(graph[node],set(path)):
-            if problem.isGoalState(successor):
-                possiblePaths.append(path + [successor])
-            else:
-                frontier.push((successor, path + [successor]))
+    (node, path) = frontier.pop()
+    explored.update(path)
+    for successor in unvisited_nodes(graph[node],explored):
+        if problem.isGoalState(successor):
+            return actions(graph, path + [successor])
+        else:
+            frontier.push((successor, path + [successor]))
+            if successor not in graph:
                 graph[successor] = problem.getSuccessors(successor)
-
 
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
-      
+  start = problem.getStartState()
+  graph = {}
+  graph[start] = problem.getSuccessors(problem.getStartState())
+  frontier = util.Queue()
+  frontier.push((start,[start]))
+  explored = set()
+
+  while frontier:
+    (node, path) = frontier.pop()
+    explored.update(path)
+    for successor in unvisited_nodes(graph[node], explored):
+        if problem.isGoalState(successor):
+            return actions(graph, path + [successor])
+        else:
+            frontier.push((successor, path + [successor]))
+            if successor not in graph:
+                graph[successor] = problem.getSuccessors(successor)
+
+def getCost(graph, position, destination):
+    for pos in graph[position]:
+        if pos[0] == destination:
+            return pos[2]
+
+
 def uniformCostSearch(problem):
-  "Search the node of least total cost first. "
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+    "Search the node of least total cost first. "
+    start = problem.getStartState()
+    frontier = util.PriorityQueue()
+    frontier.push((start,[start]),0)
+    graph = {}
+    graph[start] = problem.getSuccessors(problem.getStartState())
+    explored =set()
+
+    while frontier:
+        (node,path) = frontier.pop()
+        explored.update(path)
+        for successor in unvisited_nodes(graph[node], explored):
+            if problem.isGoalState(successor):
+                return actions(graph, path +[successor])
+            else:
+                frontier.push((successor, path + [successor]), getCost(graph, path[-1],successor))
+                if successor not in graph:
+                    graph[successor] = problem.getSuccessors(successor)
+
+
 
 def nullHeuristic(state, problem=None):
   """
