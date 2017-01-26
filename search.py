@@ -67,6 +67,32 @@ def tinyMazeSearch(problem):
   w = Directions.WEST
   return  [s,s,w,s,w,w,s,w]
 
+
+def unvisted_nodes(successors, visitedNodes):
+    unvisited = []
+    for node in successors:
+        if node[0] not in visitedNodes:
+            unvisited.append(node[0])
+    return unvisited
+
+
+def shortest_path(paths):
+    lengths = []
+    for path in paths:
+        lengths.append(len(path))
+    best = paths[lengths.index(min(lengths))]
+    return best
+
+def actions(graph,positions):
+    actions = []
+    for i in range(len(positions)-1):
+        posDest = graph[positions[i]]
+        for dest in posDest:
+            if dest[0] == positions[i+1]:
+                actions.append(dest[1])
+    return actions
+
+
 def depthFirstSearch(problem):
   """
   Search the deepest nodes in the search tree first [p 85].
@@ -82,7 +108,30 @@ def depthFirstSearch(problem):
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  from game import Directions
+
+  start = problem.getStartState()
+  graph = {}
+  graph[start] = problem.getSuccessors(problem.getStartState())
+  frontier = util.Stack()
+  frontier.push((start,[start]))
+  possiblePaths = []
+
+  while frontier:
+      if frontier.isEmpty():
+          thePath = shortest_path(possiblePaths)
+          act = actions(graph, thePath)
+          return act
+      else:
+        (node, path) = frontier.pop()
+        for successor in unvisted_nodes(graph[node],set(path)):
+            if problem.isGoalState(successor):
+                possiblePaths.append(path + [successor])
+            else:
+                frontier.push((successor, path + [successor]))
+                graph[successor] = problem.getSuccessors(successor)
+
+
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
