@@ -159,6 +159,10 @@ def breadthFirstSearch(problem):
                 graph[successor] = problem.getSuccessors(successor)
 
 def getCost(graph, position, destination):
+    """
+    Returns the cost of an action given the expanded environment, current position,
+    and destination after action has been executed.
+    """
     for pos in graph[position]:
         if pos[0] == destination:
             return pos[2]
@@ -183,7 +187,6 @@ def uniformCostSearch(problem):
                 frontier.push((successor, path + [successor]), getCost(graph, path[-1],successor))
                 if successor not in graph:
                     graph[successor] = problem.getSuccessors(successor)
-
 
 
 def nullHeuristic(state, problem=None):
