@@ -96,7 +96,11 @@ def depthFirstSearch(problem):
   while frontier:
     (node, path) = frontier.pop()
     explored.update(path)
-    for successor in [child[0] for child in problem.getSuccessors(node)if child[0] not in explored]:
+    if node not in graph:
+        successors = problem.getSuccessors(node)
+    else:
+        successors = graph[node]
+    for successor in [child[0] for child in successors if child[0] not in explored]:
         if problem.isGoalState(successor):
             return actions(graph, path + [successor])
         else:
@@ -117,7 +121,11 @@ def breadthFirstSearch(problem):
   while frontier:
     (node, path) = frontier.pop()
     explored.update(path)
-    for successor in [child[0] for child in problem.getSuccessors(node)if child[0] not in explored]:
+    if node not in graph:
+        successors = problem.getSuccessors(node)
+    else:
+        successors = graph[node]
+    for successor in [child[0] for child in successors if child[0] not in explored]:
         if problem.isGoalState(successor):
             return actions(graph, path + [successor])
         else:
@@ -187,7 +195,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             return actions(graph, path)
         explored.update(path)
         if node not in graph:
-            successors = problem.getSuccessor(node)
+            successors = problem.getSuccessors(node)
         else:
             successors = graph[node]
         for successor in [child[0] for child in successors if child[0] not in explored]:
