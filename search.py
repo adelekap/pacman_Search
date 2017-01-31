@@ -126,18 +126,10 @@ def breadthFirstSearch(problem):
                 graph[successor] = problem.getSuccessors(successor)
 
 
-def inFrontier(frontier, value):
-    """
-    Checks to see if a value is in the priority queue.
-    Returns False if the value is not yet in the frontier.
-    """
-    return value in (x[1][0] for x in frontier.heap)
-
-
 def checkCost(frontier,value,cost):
     """
     Ensures that node in the frontier does not have a higher path-cost.
-    If it does, it will repush the node with the lower cost.
+    If it does, it will push the node with the lower cost into the queue.
     """
     for x in frontier.heap:
         if x[1][0] == value and cost < x[0]:
@@ -158,9 +150,13 @@ def uniformCostSearch(problem):
         if problem.isGoalState(node):
             return actions(graph, path)
         explored.update(path)
-        for successor in [child[0] for child in problem.getSuccessors(node)if child[0] not in explored]:
+        if node not in graph:
+            successors = problem.getSuccessor(node)
+        else:
+            successors = graph[node]
+        for successor in [child[0] for child in successors if child[0] not in explored]:
             g = problem.getCostOfActions(actions(graph,path+[successor]))
-            if inFrontier(frontier, successor):
+            if successor in (x[1][0] for x in frontier.heap):
                 checkCost(frontier,successor,g)
             else:
                 frontier.push((successor, path + [successor]), g)
@@ -190,10 +186,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if problem.isGoalState(node):
             return actions(graph, path)
         explored.update(path)
-        for successor in [child[0] for child in problem.getSuccessors(node)if child[0] not in explored]:
+        if node not in graph:
+            successors = problem.getSuccessor(node)
+        else:
+            successors = graph[node]
+        for successor in [child[0] for child in successors if child[0] not in explored]:
             g = problem.getCostOfActions(actions(graph,path+[successor]))
             h = heuristic(successor, problem)
-            if inFrontier(frontier, successor):
+            if successor in (x[1][0] for x in frontier.heap):
                 checkCost(frontier,successor,g)
             else:
                 frontier.push((successor, path + [successor]), g + h)

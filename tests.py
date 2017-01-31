@@ -1,31 +1,25 @@
-def actions(graph,positions):
-    """
-    Returns the sequence of actions an agent
-    """
-    actions = []
-    for i in range(len(positions)-1):
-        posDest = graph[positions[i]]
-        for dest in posDest:
-            if dest[0] == positions[i+1]:
-                actions.append(dest[1])
-    return actions
+def uniformCostSearch(problem):
+    "Search the node of least total cost first. "
+    start = problem.getStartState()
+    frontier = util.PriorityQueue()
+    frontier.push((start,[start]),0)
+    graph = {}
+    graph[start] = problem.getSuccessors(start)
+    explored =set()
 
-
-def depthFirstSearch(problem):
-  start = problem.getStartState()
-  graph = {}
-  graph[start] = problem.getSuccessors(start)
-  frontier = util.Stack()
-  frontier.push((start,[start]))
-  explored = set()
-
-  while frontier:
-    (node, path) = frontier.pop()
-    explored.update(path)
-    for successor in [child[0] for child in problem.getSuccessors(node)if child[0] not in explored]:
-        if problem.isGoalState(successor):
-            return actions(graph, path + [successor])
-        else:
-            frontier.push((successor, path + [successor]))
+    while frontier:
+        (node,path) = frontier.pop()
+        if problem.isGoalState(node):
+            return actions(graph, path)
+        explored.update(path)
+        successors = problem.getSuccessors(node)
+        for successor in [child[0] for child in successors if child[0] not in explored]:
+            g = problem.getCostOfActions(actions(graph,path+[successor]))
+            if successor in (x[1][0] for x in frontier.heap):
+                checkCost(frontier,successor,g)
+            else:
+                frontier.push((successor, path + [successor]), g)
             if successor not in graph:
                 graph[successor] = problem.getSuccessors(successor)
+
+
