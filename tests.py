@@ -1,25 +1,14 @@
-def uniformCostSearch(problem):
-    "Search the node of least total cost first. "
-    start = problem.getStartState()
-    frontier = util.PriorityQueue()
-    frontier.push((start,[start]),0)
-    graph = {}
-    graph[start] = problem.getSuccessors(start)
-    explored =set()
+import time
+import random
 
-    while frontier:
-        (node,path) = frontier.pop()
-        if problem.isGoalState(node):
-            return actions(graph, path)
-        explored.update(path)
-        successors = problem.getSuccessors(node)
-        for successor in [child[0] for child in successors if child[0] not in explored]:
-            g = problem.getCostOfActions(actions(graph,path+[successor]))
-            if successor in (x[1][0] for x in frontier.heap):
-                checkCost(frontier,successor,g)
-            else:
-                frontier.push((successor, path + [successor]), g)
-            if successor not in graph:
-                graph[successor] = problem.getSuccessors(successor)
+base = set(range(1,100000))
 
 
+
+start = time.time()
+
+for i in range(100):
+    r = random.randint(0,1000000)
+    if(r in base):
+        print "is in !!!!"
+print time.time() - start
