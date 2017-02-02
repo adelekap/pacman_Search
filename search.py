@@ -112,26 +112,20 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     "Search the shallowest nodes in the search tree first. [p 81]"
     start = problem.getStartState()
-    graph = {}
-    graph[start] = problem.getSuccessors(problem.getStartState())
     frontier = util.Queue()
-    frontier.push((start, [start]))
+    frontier.push(Node(start,problem.getSuccessors(start)))
     explored = set()
 
     while frontier:
-        (node, path) = frontier.pop()
-        explored.update(path)
-        if node not in graph:
-            successors = problem.getSuccessors(node)
-        else:
-            successors = graph[node]
-        for successor in [child[0] for child in successors if child[0] not in explored]:
-            if problem.isGoalState(successor):
-                return actions(graph, path + [successor])
-            else:
-                frontier.push((successor, path + [successor]))
-                if successor not in graph:
-                    graph[successor] = problem.getSuccessors(successor)
+        node = frontier.pop()
+        if node.State not in explored:
+            explored.update([node.State])
+            for child in node.Children:
+                if problem.isGoalState(child[0]):
+                    goal = Node(child[0],None,node)
+                    return constructPath(goal)
+                frontier.push(Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node))
 
 
 def checkCost(frontier, value, cost):
@@ -148,28 +142,18 @@ def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     start = problem.getStartState()
     frontier = util.PriorityQueue()
-    frontier.push((start, [start]), 0)
-    graph = {}
-    graph[start] = problem.getSuccessors(start)
+    frontier.push(Node(start,problem.getSuccessors(start)),0)
     explored = set()
 
     while frontier:
-        (node, path) = frontier.pop()
-        if problem.isGoalState(node):
-            return actions(graph, path)
-        explored.update(path)
-        if node not in graph:
-            successors = problem.getSuccessor(node)
-        else:
-            successors = graph[node]
-        for successor in [child[0] for child in successors if child[0] not in explored]:
-            g = problem.getCostOfActions(actions(graph, path + [successor]))
-            if successor in (x[1][0] for x in frontier.heap):
-                checkCost(frontier, successor, g)
-            else:
-                frontier.push((successor, path + [successor]), g)
-            if successor not in graph:
-                graph[successor] = problem.getSuccessors(successor)
+        node = frontier.pop()
+        if problem.isGoalState(node.State):
+            return constructPath(node)
+        if node.State not in explored:
+            explored.update([node.State])
+            for child in node.Children:
+                frontier.push(Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node),)
 
 
 def nullHeuristic(state, problem=None):
