@@ -88,6 +88,16 @@ def constructPath(node):
         node = node.Parent
     return list(reversed(backPath))
 
+def cost(node):
+    """
+    Returns the path cost g(n) given the current node n.
+    """
+    cost = 0
+    while node.Parent != None:
+        cost += ([child[2] for child in node.Parent.Children if child[0] == node.State][0])
+        node = node.Parent
+    return cost
+
 
 def depthFirstSearch(problem):
     """
@@ -128,16 +138,6 @@ def breadthFirstSearch(problem):
                                    node))
 
 
-def checkCost(frontier, value, cost):
-    """
-    Ensures that node in the frontier does not have a higher path-cost.
-    If it does, it will push the node with the lower cost into the queue.
-    """
-    for x in frontier.heap:
-        if x[1][0] == value and cost < x[0]:
-            frontier.push(x[1], cost)
-
-
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     start = problem.getStartState()
@@ -152,8 +152,9 @@ def uniformCostSearch(problem):
         if node.State not in explored:
             explored.update([node.State])
             for child in node.Children:
-                frontier.push(Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
-                                   node),)
+                childNode = Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node)
+                frontier.push(childNode,cost(childNode))
 
 
 def nullHeuristic(state, problem=None):
@@ -168,29 +169,21 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     start = problem.getStartState()
     frontier = util.PriorityQueue()
-    frontier.push((start, [start]), 0)
-    graph = {}
-    graph[start] = problem.getSuccessors(start)
+    frontier.push(Node(start,problem.getSuccessors(start)),0)
     explored = set()
 
     while frontier:
-        (node, path) = frontier.pop()
-        if problem.isGoalState(node):
-            return actions(graph, path)
-        explored.update(path)
-        if node not in graph:
-            successors = problem.getSuccessors(node)
-        else:
-            successors = graph[node]
-        for successor in [child[0] for child in successors if child[0] not in explored]:
-            g = problem.getCostOfActions(actions(graph, path + [successor]))
-            h = heuristic(successor, problem)
-            if successor in (x[1][0] for x in frontier.heap):
-                checkCost(frontier, successor, g)
-            else:
-                frontier.push((successor, path + [successor]), g + h)
-            if successor not in graph:
-                graph[successor] = problem.getSuccessors(successor)
+        node = frontier.pop()
+        if problem.isGoalState(node.State):
+            return constructPath(node)
+        if node.State not in explored:
+            explored.update([node.State])
+            for child in node.Children:
+                childNode = Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node)
+                g = cost(childNode)
+                h = heuristic(child[0], problem)
+                frontier.push(childNode,(g + h))
 
 
 # Abbreviations
