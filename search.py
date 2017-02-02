@@ -58,6 +58,15 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
+class Node:
+    def __init__(self,state,children,parent=None,depth=None):
+        self.State = state
+        self.Parent = parent
+        self.Children = children
+        self.Depth = depth
+
+
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other
@@ -69,45 +78,35 @@ def tinyMazeSearch(problem):
     return [s, s, w, s, w, w, s, w]
 
 
-def actions(graph, positions):
+def constructPath(node):
     """
-    Returns the sequence of actions an agent
+    Returns a list of actions given the goal node (instance of Node class).
     """
-    actions = []
-    for i in range(len(positions) - 1):
-        posDest = graph[positions[i]]
-        for dest in posDest:
-            if dest[0] == positions[i + 1]:
-                actions.append(dest[1])
-    return actions
+    backPath =[]
+    while node.Parent != None:
+        backPath.append([child[1] for child in node.Parent.Children if child[0] == node.State][0])
+        node = node.Parent
+    return list(reversed(backPath))
 
 
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
     """
-
     start = problem.getStartState()
-    graph = {}
-    graph[start] = problem.getSuccessors(start)
     frontier = util.Stack()
-    frontier.push((start, [start]))
+    frontier.push(Node(start,problem.getSuccessors(start)))
     explored = set()
 
     while frontier:
-        (node, path) = frontier.pop()
-        explored.update(path)
-        if node not in graph:
-            successors = problem.getSuccessors(node)
-        else:
-            successors = graph[node]
-        for successor in [child[0] for child in successors if child[0] not in explored]:
-            if problem.isGoalState(successor):
-                return actions(graph, path + [successor])
-            else:
-                frontier.push((successor, path + [successor]))
-                if successor not in graph:
-                    graph[successor] = problem.getSuccessors(successor)
+        node = frontier.pop()
+        if problem.isGoalState(node.State):
+            return constructPath(node)
+        if node.State not in explored:
+            explored.update([node.State])
+            for child in node.Children:
+                frontier.push(Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node))
 
 
 def breadthFirstSearch(problem):
