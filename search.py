@@ -125,7 +125,6 @@ def breadthFirstSearch(problem):
     frontier = util.Queue()
     frontier.push(Node(start,problem.getSuccessors(start)))
     explored = set()
-
     while frontier:
         node = frontier.pop()
         if node.State not in explored:
