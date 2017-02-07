@@ -503,8 +503,9 @@ def foodHeuristic(state, problem):
         current = place
         unvisitedFood.remove(place)
 
-    return sum - (len(visited) / len(startFood))
-    #
+    return sum - (len(visited))
+
+
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
   def registerInitialState(self, state):
