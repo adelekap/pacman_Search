@@ -360,8 +360,7 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    node = state[0]
-    visitedCorners = state[1]
+    node, visitedCorners = state[0], state[1]
     unvisitedCorners =[corner for corner in corners if not corner in visitedCorners]
     sum = 0
 
@@ -447,34 +446,65 @@ class AStarFoodSearchAgent(SearchAgent):
     self.searchType = FoodSearchProblem
 
 def foodHeuristic(state, problem):
-  """
-  Your heuristic for the FoodSearchProblem goes here.
-  
-  This heuristic must be consistent to ensure correctness.  First, try to come up
-  with an admissible heuristic; almost all admissible heuristics will be consistent
-  as well.
-  
-  If using A* ever finds a solution that is worse uniform cost search finds,
-  your heuristic is *not* consistent, and probably not admissible!  On the other hand,
-  inadmissible or inconsistent heuristics may find optimal solutions, so be careful.
-  
-  The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a 
-  Grid (see game.py) of either True or False. You can call foodGrid.asList()
-  to get a list of food coordinates instead.
-  
-  If you want access to info like walls, capsules, etc., you can query the problem.
-  For example, problem.walls gives you a Grid of where the walls are.
-  
-  If you want to *store* information to be reused in other calls to the heuristic,
-  there is a dictionary called problem.heuristicInfo that you can use. For example,
-  if you only want to count the walls once and store that value, try:
+    """
+    Your heuristic for the FoodSearchProblem goes here.
+
+    This heuristic must be consistent to ensure correctness.  First, try to come up
+    with an admissible heuristic; almost all admissible heuristics will be consistent
+    as well.
+
+    If using A* ever finds a solution that is worse uniform cost search finds,
+    your heuristic is *not* consistent, and probably not admissible!  On the other hand,
+    inadmissible or inconsistent heuristics may find optimal solutions, so be careful.
+
+    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a
+    Grid (see game.py) of either True or False. You can call foodGrid.asList()
+    to get a list of food coordinates instead.
+
+    If you want access to info like walls, capsules, etc., you can query the problem.
+    For example, problem.walls gives you a Grid of where the walls are.
+
+    If you want to *store* information to be reused in other calls to the heuristic,
+    there is a dictionary called problem.heuristicInfo that you can use. For example,
+    if you only want to count the walls once and store that value, try:
     problem.heuristicInfo['wallCount'] = problem.walls.count()
-  Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
-  """
-  position, foodGrid = state
-  "*** YOUR CODE HERE ***"
-  return 0
-  
+    Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
+    """
+    # position, foodGrid = state
+    # foodPlaces = foodGrid.asList()
+    #
+    # problem.heuristicInfo['startFood'] = (problem.start[1]).asList()
+    #
+    #
+    # return len(foodPlaces)
+    startFood = (problem.start[1]).asList()
+    position, foodGrid = state
+    unvisitedFood = foodGrid.asList()
+    visited = [place for place in startFood if not place in unvisitedFood]
+    sum = 0
+
+    # for place in unvisitedFood:
+    #     if place not in foodPlaces:
+    #         problem.heuristicInfo['visited'] = problem.heuristicIfno['visited'] + [place]
+
+
+    current = position
+    while len(unvisitedFood) != 0:
+        distance, place = min([(util.manhattanDistance(current, place),place) for place in unvisitedFood])
+        sum += distance
+        current = place
+        unvisitedFood.remove(place)
+
+    unvisitedFood = [place for place in unvisitedFood if not place in unvisitedFood]
+    while len(unvisitedFood) != 0:
+        distance, place = min([(( (current[0] - place[0]) ** 2 + (current[1] - place[1]) ** 2 ) ** 0.5,place) for
+                                place in unvisitedFood])
+        sum += distance
+        current = place
+        unvisitedFood.remove(place)
+
+    return sum - (len(visited) / len(startFood))
+    #
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
   def registerInitialState(self, state):
