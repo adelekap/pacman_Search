@@ -483,10 +483,6 @@ def foodHeuristic(state, problem):
     visited = [place for place in startFood if not place in unvisitedFood]
     sum = 0
 
-    # for place in unvisitedFood:
-    #     if place not in foodPlaces:
-    #         problem.heuristicInfo['visited'] = problem.heuristicIfno['visited'] + [place]
-
 
     current = position
     while len(unvisitedFood) != 0:
@@ -495,15 +491,8 @@ def foodHeuristic(state, problem):
         current = place
         unvisitedFood.remove(place)
 
-    unvisitedFood = [place for place in unvisitedFood if not place in unvisitedFood]
-    while len(unvisitedFood) != 0:
-        distance, place = min([(( (current[0] - place[0]) ** 2 + (current[1] - place[1]) ** 2 ) ** 0.5,place) for
-                                place in unvisitedFood])
-        sum += distance
-        current = place
-        unvisitedFood.remove(place)
+    return sum
 
-    return sum - (len(visited))
 
 
 class ClosestDotSearchAgent(SearchAgent):
