@@ -191,6 +191,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 frontier.push(childNode,(g + h))
 
 
+
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
