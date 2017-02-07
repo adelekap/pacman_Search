@@ -445,6 +445,20 @@ class AStarFoodSearchAgent(SearchAgent):
     self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
     self.searchType = FoodSearchProblem
 
+def manhattanPath(start,end):
+    xs = [start[0], end[0]]
+    ys = [start[1], end[1]]
+    Xmove = max(xs) - min(xs)
+    Ymove = max(ys) - min (ys)
+
+    Xstages = range(min(xs), min(xs) + Xmove + 1)
+    Ystages = range(min(ys), min(ys) + Ymove + 1)
+
+    wallCheck = [(x,y) for x in Xstages for y in Ystages if (x,y) != start or (x,y) != end]
+    if len(wallCheck) == 2:
+        return [end]
+    return wallCheck
+
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -470,13 +484,10 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
-
     if 'startFood' not in problem.heuristicInfo:
         problem.heuristicInfo['startFood'] = (problem.start[1]).asList()
-    startFood = problem.heuristicInfo['startFood']
     position, foodGrid = state
     unvisitedFood = foodGrid.asList()
-    visited = [place for place in startFood if not place in unvisitedFood]
     sum = 0
 
     current = position
