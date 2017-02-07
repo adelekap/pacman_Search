@@ -57,19 +57,18 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+
 class Node(object):
-    def __init__(self, state, children = [],parent=None, dir = None):
+    def __init__(self, state, children = [],parent=None):
         self.State = state
         self.Parent = parent
         self.Children = children
-        self.Dir = dir
 
     def __iter__(self):
         return (c for c in self.State)
 
     def __eq__(self, other):
         return self.State == other
-
 
 
 def tinyMazeSearch(problem):
@@ -89,7 +88,7 @@ def constructPath(node):
     """
     backPath =[]
     while node.Parent != None:
-        backPath.append([child.Dir for child in node.Parent.Children if child.State == node.State][0])
+        backPath.append([child[1] for child in node.Parent.Children if child[0] == node.State][0])
         node = node.Parent
     return list(reversed(backPath))
 
@@ -129,9 +128,7 @@ def breadthFirstSearch(problem):
     "Search the shallowest nodes in the search tree first. [p 81]"
     start = problem.getStartState()
     frontier = util.Queue()
-    startNode = Node(start)
-    startNode.Children = [Node(s[0],parent=startNode, dir=s[1]) for s in problem.getSuccessors(startNode)]
-    frontier.push(startNode)
+    frontier.push(Node(start,problem.getSuccessors(start)))
     explored = set()
 
     while frontier:
@@ -139,13 +136,11 @@ def breadthFirstSearch(problem):
         if node.State not in explored:
             explored.update([node.State])
             for child in node.Children:
-                if problem.isGoalState(child):
-                    goal = Node(child.State,parent=node)
+                if problem.isGoalState(child[0]):
+                    goal = Node(child[0],None, node)
                     return constructPath(goal)
-                child.Children = [Node(suc[0],parent=child, dir=suc[1]) for suc in problem.getSuccessors(child) if suc[0] not in explored]
-                frontier.push(child)
-
-
+                frontier.push(Node(child[0],[suc for suc in problem.getSuccessors(child[0]) if suc[0] not in explored],
+                                   node))
 
 
 def uniformCostSearch(problem):
