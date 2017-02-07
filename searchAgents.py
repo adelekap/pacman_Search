@@ -470,19 +470,14 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
-    # position, foodGrid = state
-    # foodPlaces = foodGrid.asList()
-    #
-    # problem.heuristicInfo['startFood'] = (problem.start[1]).asList()
-    #
-    #
-    # return len(foodPlaces)
-    startFood = (problem.start[1]).asList()
+
+    if 'startFood' not in problem.heuristicInfo:
+        problem.heuristicInfo['startFood'] = (problem.start[1]).asList()
+    startFood = problem.heuristicInfo['startFood']
     position, foodGrid = state
     unvisitedFood = foodGrid.asList()
     visited = [place for place in startFood if not place in unvisitedFood]
     sum = 0
-
 
     current = position
     while len(unvisitedFood) != 0:
@@ -492,7 +487,6 @@ def foodHeuristic(state, problem):
         unvisitedFood.remove(place)
 
     return sum
-
 
 
 class ClosestDotSearchAgent(SearchAgent):
