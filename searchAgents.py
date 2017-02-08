@@ -507,15 +507,16 @@ class ClosestDotSearchAgent(SearchAgent):
     print 'Path found with cost %d.' % len(self.actions)
     
   def findPathToClosestDot(self, gameState):
+    import game
     "Returns a path (a list of actions) to the closest dot, starting from gameState"
     # Here are some useful elements of the startState
     startPosition = gameState.getPacmanPosition()
-    food = gameState.getFood()
+    food = gameState.getFood().asList()
     walls = gameState.getWalls()
     problem = AnyFoodSearchProblem(gameState)
 
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return search.bfs(problem)
+
   
 class AnyFoodSearchProblem(PositionSearchProblem):
   """
@@ -535,23 +536,23 @@ class AnyFoodSearchProblem(PositionSearchProblem):
   def __init__(self, gameState):
     "Stores information from the gameState.  You don't need to change this."
     # Store the food for later reference
-    self.food = gameState.getFood()
+    self.food = gameState.getFood().asList()
 
     # Store info for the PositionSearchProblem (no need to change this)
     self.walls = gameState.getWalls()
     self.startState = gameState.getPacmanPosition()
     self.costFn = lambda x: 1
     self._visited, self._visitedlist, self._expanded = {}, [], 0
+
     
   def isGoalState(self, state):
     """
     The state is Pacman's position. Fill this in with a goal test
     that will complete the problem definition.
     """
-    x,y = state
-    
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    distance, food = min([(util.manhattanDistance(state, food), food) for food in self.food])
+
+    return state == food
 
 ##################
 # Mini-contest 1 #
